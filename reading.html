@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Related Reading | AMD Insight</title>
+    <meta name="description" content="Books, researchers, and resources that informed AMD Insight. Explore the metabolic health literature.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-dark: #1a2f3a; --bg-darker: #0f1f28; --gold: #d4b896; --gold-bright: #e8d4b8; --text: #e8e8e8; --text-muted: #a0a0a0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 100%); color: var(--text); line-height: 1.7; min-height: 100vh; }
+        h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 600; color: var(--gold); }
+        a { color: var(--gold); text-decoration: none; }
+        a:hover { color: var(--gold-bright); }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+        nav { padding: 20px 0; border-bottom: 1px solid rgba(212, 184, 150, 0.1); }
+        nav .container { display: flex; justify-content: space-between; align-items: center; }
+        .nav-brand { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--gold); }
+        .nav-links { display: flex; gap: 30px; }
+        .nav-links a { color: var(--text-muted); font-size: 0.95rem; }
+        .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+        .page-header { padding: 60px 0 40px; text-align: center; }
+        .page-header h1 { font-size: 2.8rem; margin-bottom: 15px; }
+        .page-header p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+        
+        .section { padding: 40px 0; }
+        .section h2 { font-size: 1.8rem; margin-bottom: 25px; }
+        
+        .book-grid { display: grid; gap: 25px; }
+        .book-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(212, 184, 150, 0.1); border-radius: 8px; padding: 30px; display: grid; grid-template-columns: 100px 1fr; gap: 25px; }
+        .book-cover { width: 100%; border-radius: 4px; background: rgba(212, 184, 150, 0.1); aspect-ratio: 2/3; display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 0.8rem; }
+        .book-info h3 { font-size: 1.3rem; margin-bottom: 8px; }
+        .book-author { color: var(--gold-bright); font-size: 0.95rem; margin-bottom: 12px; }
+        .book-desc { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 15px; }
+        .book-link { display: inline-block; padding: 8px 20px; background: rgba(212, 184, 150, 0.1); border-radius: 4px; font-size: 0.9rem; }
+        .book-link:hover { background: rgba(212, 184, 150, 0.2); }
+        
+        .researcher-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .researcher { background: rgba(255,255,255,0.03); border: 1px solid rgba(212, 184, 150, 0.1); border-radius: 8px; padding: 25px; }
+        .researcher h3 { font-size: 1.1rem; margin-bottom: 5px; }
+        .researcher .title { color: var(--gold-bright); font-size: 0.85rem; margin-bottom: 12px; }
+        .researcher p { color: var(--text-muted); font-size: 0.9rem; }
+        
+        .disclaimer { background: rgba(255,255,255,0.02); border: 1px solid rgba(212, 184, 150, 0.1); border-radius: 8px; padding: 20px; margin-top: 40px; font-size: 0.85rem; color: var(--text-muted); }
+        
+        footer { padding: 40px 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; border-top: 1px solid rgba(212, 184, 150, 0.1); margin-top: 60px; }
+        
+        @media (max-width: 768px) { .book-card { grid-template-columns: 1fr; } .book-cover { max-width: 100px; } }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="container">
+        <a href="index.html" class="nav-brand">AMD Insight</a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="book.html">The Book</a>
+            <a href="references.html">References</a>
+            <a href="about.html">About</a>
+        </div>
+    </div>
+</nav>
+
+<header class="page-header">
+    <div class="container">
+        <h1>Related Reading</h1>
+        <p>Books and researchers that shaped the metabolic framework behind AMD Insight.</p>
+    </div>
+</header>
+
+<main class="container">
+    
+    <section class="section">
+        <h2>Essential Books</h2>
+        <div class="book-grid">
+            
+            <div class="book-card">
+                <div class="book-cover">Cover</div>
+                <div class="book-info">
+                    <h3>The Clot Thickens</h3>
+                    <p class="book-author">Dr. Malcolm Kendrick</p>
+                    <p class="book-desc">The definitive case that cardiovascular disease is fundamentally about endothelial damage and clotting—not cholesterol. Essential reading for understanding the vascular parallels to AMD. Kendrick's framework directly informed the drusen-plaque connection explored in AMD Insight.</p>
+                    <a href="https://www.amazon.com/dp/1907797769" target="_blank" class="book-link">View on Amazon →</a>
+                </div>
+            </div>
+            
+            <div class="book-card">
+                <div class="book-cover">Cover</div>
+                <div class="book-info">
+                    <h3>Doctoring Data</h3>
+                    <p class="book-author">Dr. Malcolm Kendrick</p>
+                    <p class="book-desc">How to read medical research critically. Learn to spot the statistical tricks, cherry-picking, and conflicts of interest that distort the literature. Essential for evaluating any health claim—including the ones in AMD Insight.</p>
+                    <a href="https://www.amazon.com/dp/1907797467" target="_blank" class="book-link">View on Amazon →</a>
+                </div>
+            </div>
+            
+            <div class="book-card">
+                <div class="book-cover">Cover</div>
+                <div class="book-info">
+                    <h3>Deep Nutrition</h3>
+                    <p class="book-author">Dr. Catherine Shanahan</p>
+                    <p class="book-desc">The case against seed oils and modern industrial foods. Shanahan's work on polyunsaturated fatty acids and metabolic dysfunction provides crucial context for understanding dietary contributors to AMD.</p>
+                    <a href="https://www.amazon.com/dp/1250113822" target="_blank" class="book-link">View on Amazon →</a>
+                </div>
+            </div>
+            
+            <div class="book-card">
+                <div class="book-cover">Cover</div>
+                <div class="book-info">
+                    <h3>Survival of the Fattest</h3>
+                    <p class="book-author">Dr. Stephen Cunnane</p>
+                    <p class="book-desc">The role of DHA and shoreline nutrition in human brain evolution. Cunnane's research explains why the retina—an extension of the brain—depends so heavily on marine-derived nutrients.</p>
+                    <a href="https://www.amazon.com/dp/9812561919" target="_blank" class="book-link">View on Amazon →</a>
+                </div>
+            </div>
+            
+            <div class="book-card">
+                <div class="book-cover">Cover</div>
+                <div class="book-info">
+                    <h3>The Oxygen Advantage</h3>
+                    <p class="book-author">Patrick McKeown</p>
+                    <p class="book-desc">The science of breathing, CO₂ tolerance, and the Bohr effect. McKeown's work on functional breathing directly informs the carbon dioxide chapter of AMD Insight.</p>
+                    <a href="https://www.amazon.com/dp/0062349473" target="_blank" class="book-link">View on Amazon →</a>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+    
+    <section class="section">
+        <h2>Key Researchers</h2>
+        <div class="researcher-grid">
+            
+            <div class="researcher">
+                <h3>Dr. Ray Peat</h3>
+                <p class="title">Physiologist & Researcher</p>
+                <p>Pioneering work on thyroid, metabolism, and the dangers of polyunsaturated fats. His framework connecting cellular respiration to chronic disease underlies much of the metabolic approach.</p>
+            </div>
+            
+            <div class="researcher">
+                <h3>Dr. Nicolas Bazan</h3>
+                <p class="title">Neuroscience Center, LSU</p>
+                <p>Discovered neuroprotectin D1 (NPD1), the protective molecule synthesized from DHA that helps protect retinal cells from oxidative damage and inflammation.</p>
+            </div>
+            
+            <div class="researcher">
+                <h3>Prof. Michael Crawford</h3>
+                <p class="title">Imperial College London</p>
+                <p>Decades of research on DHA and brain evolution. His work connecting human cognitive development to shoreline habitation explains the retina's dependence on marine nutrition.</p>
+            </div>
+            
+            <div class="researcher">
+                <h3>Dr. Michael Hamblin</h3>
+                <p class="title">Harvard Medical School</p>
+                <p>Leading researcher in photobiomodulation. His work on red and near-infrared light therapy provides the mechanistic foundation for light-based AMD interventions.</p>
+            </div>
+            
+            <div class="researcher">
+                <h3>Dr. Chris Knobbe</h3>
+                <p class="title">Ophthalmologist & Researcher</p>
+                <p>Author of "Ancestral Dietary Strategy to Prevent and Treat Macular Degeneration." Directly addresses the role of seed oils in AMD development.</p>
+            </div>
+            
+            <div class="researcher">
+                <h3>Dr. Yandell Henderson</h3>
+                <p class="title">Yale Physiologist (1873-1944)</p>
+                <p>Pioneer in understanding carbon dioxide's role in oxygen delivery. His work on the Bohr effect and tissue oxygenation remains relevant to understanding retinal blood flow.</p>
+            </div>
+            
+        </div>
+    </section>
+    
+    <section class="section">
+        <h2>Online Resources</h2>
+        <div class="book-grid">
+            <div class="book-card" style="grid-template-columns: 1fr;">
+                <div class="book-info">
+                    <h3>Ray Peat's Articles</h3>
+                    <p class="book-desc">Free essays on metabolism, hormones, and the bioenergetic approach to health. Dense reading but foundational for understanding the metabolic perspective.</p>
+                    <a href="http://raypeat.com/articles/" target="_blank" class="book-link">raypeat.com →</a>
+                </div>
+            </div>
+            <div class="book-card" style="grid-template-columns: 1fr;">
+                <div class="book-info">
+                    <h3>PubMed</h3>
+                    <p class="book-desc">The primary database for biomedical literature. All 180+ references in AMD Insight can be explored further through PubMed.</p>
+                    <a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" class="book-link">pubmed.ncbi.nlm.nih.gov →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <div class="disclaimer">
+        <strong>Affiliate Disclosure:</strong> Some links on this page are affiliate links. If you purchase through these links, we may receive a small commission at no additional cost to you. This helps support the ongoing research and maintenance of AMD Insight.
+    </div>
+    
+</main>
+
+<footer>
+    <div class="container">
+        <p>© 2025 Elliott English. All rights reserved.</p>
+        <p style="margin-top: 10px;"><a href="index.html">Home</a> · <a href="references.html">References</a> · <a href="about.html">About</a></p>
+    </div>
+</footer>
+
+</body>
+</html>

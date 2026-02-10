@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | AMD Insight</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0f1a1a; --text: #e8e0d6; --gold: #d4b896; --muted: #8a8078; --card-bg: rgba(255,255,255,0.03); --border: rgba(212,184,150,0.15); --green: #6fc88a; --red: #c87070; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 20px; max-width: 900px; margin: 0 auto; }
+        h1 { font-size: 1.8rem; margin-bottom: 20px; }
+        h2 { font-size: 1.4rem; margin: 40px 0 15px; color: var(--gold); }
+        h3 { font-size: 1.1rem; margin-bottom: 8px; }
+
+        /* Login */
+        .login-box { max-width: 350px; margin: 100px auto; text-align: center; }
+        .login-box h1 { margin-bottom: 25px; }
+        .login-box input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 6px; background: var(--card-bg); color: var(--text); font-size: 0.95rem; margin-bottom: 12px; font-family: inherit; }
+        .login-box input::placeholder { color: var(--muted); }
+
+        /* Buttons */
+        .btn { padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 0.9rem; }
+        .btn-gold { background: var(--gold); color: var(--bg); }
+        .btn-green { background: var(--green); color: #111; }
+        .btn-red { background: var(--red); color: #fff; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn:disabled { opacity: 0.5; cursor: default; }
+        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
+        /* Cards */
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 15px; }
+        .card-meta { font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
+        .card p { font-size: 0.9rem; color: var(--muted); margin-bottom: 10px; }
+        .card-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .card-url { font-size: 0.85rem; word-break: break-all; }
+        .tag { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; background: rgba(212,184,150,0.15); color: var(--gold); margin-right: 6px; }
+
+        /* PubMed enrichment */
+        .pubmed-info { background: rgba(100,200,150,0.08); border: 1px solid rgba(100,200,150,0.2); border-radius: 6px; padding: 12px; margin-top: 10px; font-size: 0.85rem; }
+        .pubmed-info strong { color: var(--green); }
+
+        .error { color: var(--red); font-size: 0.9rem; margin-top: 8px; }
+        .empty { color: var(--muted); font-style: italic; padding: 30px; text-align: center; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .status { font-size: 0.85rem; color: var(--muted); }
+    </style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="login-section" class="login-box">
+    <h1>Admin Login</h1>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button class="btn btn-gold" style="width:100%" onclick="login()">Log In</button>
+    <p id="login-error" class="error"></p>
+</div>
+
+<!-- Admin Panel -->
+<div id="admin-panel" style="display:none">
+    <div class="header">
+        <h1>AMD Insight Admin</h1>
+        <div>
+            <span class="status" id="user-email"></span>
+            <button class="btn btn-outline btn-sm" onclick="logout()" style="margin-left:10px">Log Out</button>
+        </div>
+    </div>
+
+    <h2>Pending Submissions (<span id="sub-count">0</span>)</h2>
+    <div id="submissions-list"><div class="empty">Loading...</div></div>
+
+    <h2>Approved Resources (<span id="res-count">0</span>)</h2>
+    <div id="resources-list"><div class="empty">Loading...</div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://gtrekvuelckdgsvesnpg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0cmVrdnVlbGNrZGdzdmVzbnBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MDMwNDksImV4cCI6MjA4NjA3OTA0OX0.zBIeKQ5Redx_uXtm4F7E3cNwVBLpzmJIsdDJ0k7AknI';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function formatLabel(s) { return s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()); }
+function escapeHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+// Extract PubMed ID from URL
+function extractPmid(url) {
+    if (!url) return null;
+    var m = url.match(/pubmed\.ncbi\.nlm\.nih\.gov\/(\d+)/);
+    if (m) return m[1];
+    m = url.match(/pubmed[/.].*[?&]term=(\d+)/);
+    return m ? m[1] : null;
+}
+
+// Fetch PubMed article info
+async function fetchPubMed(pmid) {
+    var res = await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=' + pmid + '&retmode=json');
+    var data = await res.json();
+    var article = data.result[pmid];
+    if (!article || article.error) return null;
+    return {
+        title: article.title,
+        authors: (article.authors || []).map(function(a) { return a.name; }).join(', '),
+        journal: article.source,
+        year: article.pubdate ? article.pubdate.split(' ')[0] : '',
+        pmid: pmid
+    };
+}
+
+// Auth
+async function login() {
+    var email = document.getElementById('email').value.trim();
+    var pw = document.getElementById('password').value;
+    document.getElementById('login-error').textContent = '';
+    var { error } = await sb.auth.signInWithPassword({ email: email, password: pw });
+    if (error) {
+        document.getElementById('login-error').textContent = error.message;
+    } else {
+        showAdmin();
+    }
+}
+
+async function logout() {
+    await sb.auth.signOut();
+    document.getElementById('admin-panel').style.display = 'none';
+    document.getElementById('login-section').style.display = 'block';
+    document.getElementById('password').value = '';
+}
+
+async function showAdmin() {
+    var { data: { user } } = await sb.auth.getUser();
+    if (!user) return;
+    document.getElementById('login-section').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+    document.getElementById('user-email').textContent = user.email;
+    loadSubmissions();
+    loadResources();
+}
+
+// Load pending submissions
+async function loadSubmissions() {
+    var { data, error } = await sb.from('submissions').select('*').order('created_at', { ascending: false });
+    var el = document.getElementById('submissions-list');
+    document.getElementById('sub-count').textContent = data ? data.length : 0;
+
+    if (error) { el.innerHTML = '<p class="error">Error: ' + escapeHtml(error.message) + '</p>'; return; }
+    if (!data || data.length === 0) { el.innerHTML = '<div class="empty">No pending submissions.</div>'; return; }
+
+    el.innerHTML = data.map(function(s) {
+        var pmid = extractPmid(s.url);
+        var urlHtml = s.url ? '<p class="card-url"><a href="' + escapeHtml(s.url) + '" target="_blank" rel="noopener">' + escapeHtml(s.url) + '</a></p>' : '';
+        var pubmedBtn = pmid ? '<button class="btn btn-outline btn-sm" onclick="enrichPubMed(\'' + s.id + '\', \'' + pmid + '\')">Fetch PubMed Info</button>' : '';
+
+        return '<div class="card" id="sub-' + s.id + '">' +
+            '<div class="card-meta">' + new Date(s.created_at).toLocaleDateString() + (s.submitted_by ? ' &middot; by ' + escapeHtml(s.submitted_by) : '') + '</div>' +
+            '<h3>' + escapeHtml(s.title) + '</h3>' +
+            '<p>' + escapeHtml(s.description) + '</p>' +
+            urlHtml +
+            '<div><span class="tag">' + formatLabel(s.category) + '</span><span class="tag">' + formatLabel(s.evidence_level) + '</span></div>' +
+            '<div id="pubmed-' + s.id + '"></div>' +
+            '<div class="card-actions" style="margin-top:12px">' +
+                '<button class="btn btn-green btn-sm" onclick="approve(\'' + s.id + '\')">Approve</button>' +
+                '<button class="btn btn-red btn-sm" onclick="reject(\'' + s.id + '\')">Reject</button>' +
+                pubmedBtn +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+// Load approved resources
+async function loadResources() {
+    var { data, error } = await sb.from('resources').select('*').eq('approved', true).order('votes', { ascending: false });
+    var el = document.getElementById('resources-list');
+    document.getElementById('res-count').textContent = data ? data.length : 0;
+
+    if (error) { el.innerHTML = '<p class="error">Error: ' + escapeHtml(error.message) + '</p>'; return; }
+    if (!data || data.length === 0) { el.innerHTML = '<div class="empty">No approved resources yet.</div>'; return; }
+
+    el.innerHTML = data.map(function(r) {
+        var urlHtml = r.url ? '<a href="' + escapeHtml(r.url) + '" target="_blank" rel="noopener" class="card-url" style="font-size:0.8rem">' + escapeHtml(r.url) + '</a>' : '';
+        return '<div class="card">' +
+            '<h3>' + escapeHtml(r.title) + '</h3>' +
+            '<p>' + escapeHtml(r.description) + '</p>' +
+            '<div style="margin-bottom:8px"><span class="tag">' + formatLabel(r.category) + '</span><span class="tag">' + formatLabel(r.evidence_level) + '</span></div>' +
+            '<div class="card-meta">' + r.votes + ' votes &middot; ' + r.clicks + ' clicks &middot; ' + urlHtml + '</div>' +
+        '</div>';
+    }).join('');
+}
+
+// Approve submission → move to resources
+async function approve(id) {
+    var btn = event.target;
+    btn.disabled = true;
+    btn.textContent = 'Approving...';
+
+    // Get submission data
+    var { data: subs } = await sb.from('submissions').select('*').eq('id', id);
+    if (!subs || subs.length === 0) { alert('Submission not found.'); return; }
+    var s = subs[0];
+
+    // Insert into resources
+    var { error: insertErr } = await sb.from('resources').insert([{
+        title: s.title,
+        description: s.description,
+        url: s.url,
+        category: s.category,
+        evidence_level: s.evidence_level,
+        submitted_by: s.submitted_by,
+        approved: true,
+        votes: 0,
+        clicks: 0
+    }]);
+
+    if (insertErr) { alert('Error approving: ' + insertErr.message); btn.disabled = false; btn.textContent = 'Approve'; return; }
+
+    // Delete from submissions
+    await sb.from('submissions').delete().eq('id', id);
+
+    // Refresh
+    loadSubmissions();
+    loadResources();
+}
+
+// Reject submission → delete
+async function reject(id) {
+    if (!confirm('Reject this submission? It will be permanently deleted.')) return;
+    var btn = event.target;
+    btn.disabled = true;
+    await sb.from('submissions').delete().eq('id', id);
+    loadSubmissions();
+}
+
+// PubMed enrichment
+async function enrichPubMed(subId, pmid) {
+    var el = document.getElementById('pubmed-' + subId);
+    el.innerHTML = '<p style="color:var(--muted);font-size:0.85rem">Fetching PubMed data...</p>';
+
+    var info = await fetchPubMed(pmid);
+    if (!info) {
+        el.innerHTML = '<p class="error">Could not fetch PubMed data for PMID ' + pmid + '</p>';
+        return;
+    }
+
+    el.innerHTML = '<div class="pubmed-info">' +
+        '<strong>PubMed Article:</strong><br>' +
+        '<b>' + escapeHtml(info.title) + '</b><br>' +
+        escapeHtml(info.authors) + '<br>' +
+        '<i>' + escapeHtml(info.journal) + ' (' + escapeHtml(info.year) + ')</i>' +
+    '</div>';
+}
+
+// Check if already logged in
+sb.auth.getUser().then(function(result) {
+    if (result.data.user) showAdmin();
+});
+</script>
+
+</body>
+</html>

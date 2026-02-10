@@ -5,54 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Book | AMD Insight</title>
     <meta name="description" content="AMD Insight: A Metabolic Lens on Macular Degeneration. Explore the chapters, read a sample, and get your copy.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="The Book — AMD Insight">
+    <meta property="og:description" content="AMD Insight: A Metabolic Lens on Macular Degeneration. Explore the chapters, read a sample, and get your copy.">
+    <meta property="og:image" content="https://amdinsight.com/assets/cover.png">
+    <meta property="og:url" content="https://amdinsight.com/book.html">
+    <meta property="og:site_name" content="AMD Insight">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <style>
-        :root { --bg-dark: #1a2f3a; --bg-darker: #0f1f28; --gold: #d4b896; --gold-bright: #e8d4b8; --text: #e8e8e8; --text-muted: #a0a0a0; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 100%); color: var(--text); line-height: 1.7; min-height: 100vh; }
-        h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 600; color: var(--gold); }
-        a { color: var(--gold); text-decoration: none; }
-        a:hover { color: var(--gold-bright); }
-        .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
-        nav { padding: 20px 0; border-bottom: 1px solid rgba(212, 184, 150, 0.1); }
-        nav .container { display: flex; justify-content: space-between; align-items: center; }
-        .nav-brand { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--gold); }
-        .nav-links { display: flex; gap: 30px; }
-        .nav-links a { color: var(--text-muted); font-size: 0.95rem; }
-        .nav-links a:hover, .nav-links a.active { color: var(--gold); }
-        
         .hero { padding: 60px 0; display: grid; grid-template-columns: 280px 1fr; gap: 50px; align-items: start; }
         .cover { width: 100%; border-radius: 4px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
         .hero-content h1 { font-size: 2.6rem; margin-bottom: 10px; }
         .subtitle { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--gold-bright); font-style: italic; margin-bottom: 25px; }
         .description { color: var(--text-muted); margin-bottom: 25px; font-size: 1.05rem; }
         .buy-buttons { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
-        .btn { display: inline-block; padding: 14px 28px; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; }
-        .btn-primary { background: var(--gold); color: var(--bg-darker); }
-        .btn-primary:hover { background: var(--gold-bright); }
-        .btn-secondary { border: 1px solid var(--gold); color: var(--gold); }
-        .btn-secondary:hover { background: rgba(212, 184, 150, 0.1); }
-        
+
         .section { padding: 60px 0; border-top: 1px solid rgba(212, 184, 150, 0.1); }
         .section h2 { font-size: 2rem; margin-bottom: 30px; text-align: center; }
-        
+
         .thesis-box { background: rgba(255,255,255,0.03); border-left: 3px solid var(--gold); padding: 25px 30px; margin: 30px 0; }
         .thesis-box p { font-size: 1.15rem; color: var(--text); }
-        
+
         .chapters { list-style: none; }
         .chapter { background: rgba(255,255,255,0.02); border: 1px solid rgba(212, 184, 150, 0.1); border-radius: 8px; padding: 25px; margin-bottom: 15px; display: grid; grid-template-columns: 50px 1fr; gap: 20px; align-items: start; }
         .chapter-num { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: var(--gold); font-weight: 600; }
         .chapter h3 { font-size: 1.2rem; margin-bottom: 8px; }
         .chapter p { color: var(--text-muted); font-size: 0.95rem; }
-        
+
         .sample-section { background: rgba(212, 184, 150, 0.05); border-radius: 8px; padding: 40px; text-align: center; }
         .sample-section h3 { font-size: 1.5rem; margin-bottom: 15px; }
         .sample-section p { color: var(--text-muted); margin-bottom: 20px; }
-        
-        footer { padding: 40px 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; border-top: 1px solid rgba(212, 184, 150, 0.1); }
-        
+
         @media (max-width: 768px) {
             .hero { grid-template-columns: 1fr; text-align: center; }
             .cover { max-width: 220px; margin: 0 auto; }
@@ -67,10 +54,15 @@
 <nav>
     <div class="container">
         <a href="index.html" class="nav-brand">AMD Insight</a>
+        <input type="checkbox" id="nav-toggle" class="nav-toggle">
+        <label for="nav-toggle" class="hamburger" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+        </label>
         <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="book.html" class="active">The Book</a>
             <a href="references.html">References</a>
+            <a href="cure.html">Help Cure AMD</a>
             <a href="about.html">About</a>
         </div>
     </div>
@@ -86,8 +78,8 @@
             <p class="subtitle">A Metabolic Lens on Macular Degeneration</p>
             <p class="description">What if the deposits destroying your vision share the same root cause as heart disease? A groundbreaking framework for understanding—and potentially reversing—age-related macular degeneration.</p>
             <div class="buy-buttons">
-                <a href="#" class="btn btn-primary">Kindle Edition</a>
-                <a href="#" class="btn btn-secondary">Paperback</a>
+                <a href="#" class="btn btn-primary coming-soon-link" title="Coming soon">Kindle Edition</a>
+                <a href="#" class="btn btn-secondary coming-soon-link" title="Coming soon">Paperback</a>
                 <a href="audiobook.html" class="btn btn-secondary">Audiobook</a>
             </div>
             <p style="color: var(--text-muted); font-size: 0.9rem;">Also available on Amazon worldwide</p>
@@ -144,7 +136,7 @@
                 <span class="chapter-num">6</span>
                 <div>
                     <h3>The Critical Role of Carbon Dioxide</h3>
-                    <p>The misunderstood molecule. Why CO₂ is essential for oxygen delivery and how breathing patterns affect your eyes.</p>
+                    <p>The misunderstood molecule. Why CO&#8322; is essential for oxygen delivery and how breathing patterns affect your eyes.</p>
                 </div>
             </li>
             <li class="chapter">
@@ -203,15 +195,22 @@
         <div class="sample-section">
             <h3>Read a Free Sample</h3>
             <p>Download the first two chapters to see if this approach resonates with you.</p>
-            <a href="#" class="btn btn-primary">Download Sample (PDF)</a>
+            <a href="#" class="btn btn-primary coming-soon-link" title="Coming soon">Download Sample (PDF)</a>
         </div>
     </section>
 </main>
 
 <footer>
     <div class="container">
-        <p>© 2025 Elliott English. All rights reserved.</p>
-        <p style="margin-top: 10px;"><a href="index.html">Home</a> · <a href="references.html">References</a> · <a href="about.html">About</a></p>
+        <p>&copy; 2026 Elliott English. All rights reserved.</p>
+        <p style="margin-top: 10px;">
+            <a href="index.html">Home</a> &middot;
+            <a href="references.html">References</a> &middot;
+            <a href="cure.html">Help Cure AMD</a> &middot;
+            <a href="reading.html">Related Reading</a> &middot;
+            <a href="about.html">About</a> &middot;
+            <a href="newsletter.html">Newsletter</a>
+        </p>
     </div>
 </footer>
 

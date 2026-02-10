@@ -5,54 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Newsletter | AMD Insight</title>
     <meta name="description" content="Stay updated on AMD research, new chapters, and audiobook releases.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Newsletter — AMD Insight">
+    <meta property="og:description" content="Stay updated on AMD research, new chapters, and audiobook releases.">
+    <meta property="og:image" content="https://amdinsight.com/assets/cover.png">
+    <meta property="og:url" content="https://amdinsight.com/newsletter.html">
+    <meta property="og:site_name" content="AMD Insight">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="stylesheet" href="styles.css">
     <style>
-        :root { --bg-dark: #1a2f3a; --bg-darker: #0f1f28; --gold: #d4b896; --gold-bright: #e8d4b8; --text: #e8e8e8; --text-muted: #a0a0a0; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 100%); color: var(--text); line-height: 1.7; min-height: 100vh; display: flex; flex-direction: column; }
-        h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 600; color: var(--gold); }
-        a { color: var(--gold); text-decoration: none; }
-        a:hover { color: var(--gold-bright); }
-        .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
-        nav { padding: 20px 0; border-bottom: 1px solid rgba(212, 184, 150, 0.1); }
-        nav .container { display: flex; justify-content: space-between; align-items: center; }
-        .nav-brand { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--gold); }
-        .nav-links { display: flex; gap: 30px; }
-        .nav-links a { color: var(--text-muted); font-size: 0.95rem; }
-        .nav-links a:hover, .nav-links a.active { color: var(--gold); }
-        
+        body { display: flex; flex-direction: column; }
         main { flex: 1; display: flex; align-items: center; padding: 60px 0; }
         .signup-box { max-width: 500px; margin: 0 auto; text-align: center; }
         .signup-box h1 { font-size: 2.8rem; margin-bottom: 20px; }
         .signup-box .subtitle { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--gold-bright); font-style: italic; margin-bottom: 30px; }
         .signup-box p { color: var(--text-muted); margin-bottom: 30px; }
-        
+
         .form-container { background: rgba(255,255,255,0.03); border: 1px solid rgba(212, 184, 150, 0.15); border-radius: 12px; padding: 40px; }
         .form-group { margin-bottom: 20px; text-align: left; }
         .form-group label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.9rem; }
         .form-group input { width: 100%; padding: 14px 18px; border: 1px solid rgba(212, 184, 150, 0.2); border-radius: 6px; background: rgba(255,255,255,0.03); color: var(--text); font-size: 1rem; font-family: inherit; }
         .form-group input:focus { outline: none; border-color: var(--gold); }
         .form-group input::placeholder { color: var(--text-muted); }
-        
-        .btn { display: inline-block; width: 100%; padding: 16px 32px; border: none; border-radius: 6px; font-weight: 500; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; font-family: inherit; }
-        .btn-primary { background: var(--gold); color: var(--bg-darker); }
-        .btn-primary:hover { background: var(--gold-bright); }
-        
+
+        .btn { width: 100%; border: none; cursor: pointer; font-family: inherit; }
+
         .benefits { margin-top: 40px; text-align: left; }
         .benefits h3 { font-size: 1.1rem; margin-bottom: 15px; text-align: center; }
         .benefit-list { list-style: none; }
         .benefit-list li { padding: 10px 0; color: var(--text-muted); font-size: 0.95rem; display: flex; align-items: flex-start; gap: 12px; }
-        .benefit-list li::before { content: "✓"; color: var(--gold); font-weight: bold; flex-shrink: 0; }
-        
+        .benefit-list li::before { content: "\2713"; color: var(--gold); font-weight: bold; flex-shrink: 0; }
+
         .privacy-note { margin-top: 25px; font-size: 0.85rem; color: var(--text-muted); }
-        
+
         .dev-notice { background: rgba(255, 200, 100, 0.1); border: 1px dashed rgba(255, 200, 100, 0.3); border-radius: 8px; padding: 20px; margin-bottom: 30px; }
         .dev-notice p { color: rgba(255, 200, 100, 0.8); font-size: 0.9rem; margin: 0; }
-        
-        footer { padding: 40px 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; border-top: 1px solid rgba(212, 184, 150, 0.1); }
-        
+
         @media (max-width: 768px) { .signup-box h1 { font-size: 2.2rem; } .form-container { padding: 30px 20px; } }
     </style>
 </head>
@@ -61,10 +52,15 @@
 <nav>
     <div class="container">
         <a href="index.html" class="nav-brand">AMD Insight</a>
+        <input type="checkbox" id="nav-toggle" class="nav-toggle">
+        <label for="nav-toggle" class="hamburger" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+        </label>
         <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="book.html">The Book</a>
             <a href="references.html">References</a>
+            <a href="cure.html">Help Cure AMD</a>
             <a href="about.html">About</a>
         </div>
     </div>
@@ -76,12 +72,12 @@
             <h1>Stay Updated</h1>
             <p class="subtitle">New research. New chapters. No spam.</p>
             <p>Get notified when the audiobook launches, when new research is added, and when major updates are made to the book.</p>
-            
+
             <div class="form-container">
                 <div class="dev-notice">
                     <p>🚧 Newsletter signup coming soon. Check back shortly!</p>
                 </div>
-                
+
                 <form action="#" method="POST">
                     <div class="form-group">
                         <label for="email">Email Address</label>
@@ -89,7 +85,7 @@
                     </div>
                     <button type="submit" class="btn btn-primary" disabled>Join the List</button>
                 </form>
-                
+
                 <div class="benefits">
                     <h3>What you'll receive:</h3>
                     <ul class="benefit-list">
@@ -99,7 +95,7 @@
                         <li>Occasional deep-dives on specific topics</li>
                     </ul>
                 </div>
-                
+
                 <p class="privacy-note">No spam, ever. Unsubscribe anytime. Your email is never shared.</p>
             </div>
         </div>
@@ -108,8 +104,15 @@
 
 <footer>
     <div class="container">
-        <p>© 2025 Elliott English. All rights reserved.</p>
-        <p style="margin-top: 10px;"><a href="index.html">Home</a> · <a href="references.html">References</a> · <a href="about.html">About</a></p>
+        <p>&copy; 2026 Elliott English. All rights reserved.</p>
+        <p style="margin-top: 10px;">
+            <a href="index.html">Home</a> &middot;
+            <a href="references.html">References</a> &middot;
+            <a href="cure.html">Help Cure AMD</a> &middot;
+            <a href="reading.html">Related Reading</a> &middot;
+            <a href="about.html">About</a> &middot;
+            <a href="newsletter.html">Newsletter</a>
+        </p>
     </div>
 </footer>
 

@@ -5,36 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audiobook | AMD Insight</title>
     <meta name="description" content="Listen to AMD Insight: A Metabolic Lens on Macular Degeneration. Full audiobook available free.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Audiobook — AMD Insight">
+    <meta property="og:description" content="Listen to AMD Insight: A Metabolic Lens on Macular Degeneration. Full audiobook available free.">
+    <meta property="og:image" content="https://amdinsight.com/assets/cover.png">
+    <meta property="og:url" content="https://amdinsight.com/audiobook.html">
+    <meta property="og:site_name" content="AMD Insight">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="stylesheet" href="styles.css">
     <style>
-        :root { --bg-dark: #1a2f3a; --bg-darker: #0f1f28; --gold: #d4b896; --gold-bright: #e8d4b8; --text: #e8e8e8; --text-muted: #a0a0a0; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 100%); color: var(--text); line-height: 1.7; min-height: 100vh; }
-        h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 600; color: var(--gold); }
-        a { color: var(--gold); text-decoration: none; }
-        a:hover { color: var(--gold-bright); }
-        .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
-        nav { padding: 20px 0; border-bottom: 1px solid rgba(212, 184, 150, 0.1); }
-        nav .container { display: flex; justify-content: space-between; align-items: center; }
-        .nav-brand { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--gold); }
-        .nav-links { display: flex; gap: 30px; }
-        .nav-links a { color: var(--text-muted); font-size: 0.95rem; }
-        .nav-links a:hover, .nav-links a.active { color: var(--gold); }
-        
         .hero { padding: 80px 0; text-align: center; }
         .hero h1 { font-size: 3rem; margin-bottom: 15px; }
         .hero .subtitle { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--gold-bright); font-style: italic; margin-bottom: 30px; }
         .hero p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto 30px; }
-        
+
         .coming-soon { background: rgba(212, 184, 150, 0.1); border: 2px dashed var(--gold); border-radius: 12px; padding: 60px 40px; max-width: 600px; margin: 0 auto; }
         .coming-soon h2 { font-size: 1.8rem; margin-bottom: 20px; }
         .coming-soon p { color: var(--text-muted); margin-bottom: 25px; }
-        .btn { display: inline-block; padding: 14px 32px; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; }
-        .btn-primary { background: var(--gold); color: var(--bg-darker); }
-        .btn-primary:hover { background: var(--gold-bright); }
-        
+
         .features { padding: 60px 0; border-top: 1px solid rgba(212, 184, 150, 0.1); margin-top: 60px; }
         .features h2 { font-size: 2rem; text-align: center; margin-bottom: 40px; }
         .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
@@ -42,15 +33,13 @@
         .feature-icon { font-size: 2.5rem; margin-bottom: 15px; }
         .feature h3 { font-size: 1.2rem; margin-bottom: 10px; }
         .feature p { color: var(--text-muted); font-size: 0.95rem; }
-        
+
         .sample-section { padding: 60px 0; }
         .sample-section h2 { font-size: 2rem; text-align: center; margin-bottom: 20px; }
         .sample-section > p { color: var(--text-muted); text-align: center; margin-bottom: 30px; }
         .audio-player { background: rgba(255,255,255,0.03); border: 1px solid rgba(212, 184, 150, 0.1); border-radius: 8px; padding: 30px; max-width: 600px; margin: 0 auto; }
         .audio-placeholder { text-align: center; padding: 40px; color: var(--text-muted); font-style: italic; }
-        
-        footer { padding: 40px 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; border-top: 1px solid rgba(212, 184, 150, 0.1); margin-top: 60px; }
-        
+
         @media (max-width: 768px) { .hero h1 { font-size: 2.2rem; } .coming-soon { padding: 40px 25px; } }
     </style>
 </head>
@@ -59,10 +48,15 @@
 <nav>
     <div class="container">
         <a href="index.html" class="nav-brand">AMD Insight</a>
+        <input type="checkbox" id="nav-toggle" class="nav-toggle">
+        <label for="nav-toggle" class="hamburger" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+        </label>
         <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="book.html">The Book</a>
             <a href="references.html">References</a>
+            <a href="cure.html">Help Cure AMD</a>
             <a href="about.html">About</a>
         </div>
     </div>
@@ -73,14 +67,14 @@
         <h1>Listen to AMD Insight</h1>
         <p class="subtitle">The full audiobook, available free</p>
         <p>Over 7 hours of content covering the complete metabolic framework for understanding and addressing age-related macular degeneration.</p>
-        
+
         <div class="coming-soon">
             <h2>🎧 Coming Soon</h2>
             <p>The audiobook is currently in production. Sign up to be notified when it's available.</p>
             <a href="newsletter.html" class="btn btn-primary">Notify Me</a>
         </div>
     </section>
-    
+
     <section class="features">
         <h2>What to Expect</h2>
         <div class="feature-grid">
@@ -106,7 +100,7 @@
             </div>
         </div>
     </section>
-    
+
     <section class="sample-section">
         <h2>Sample Chapters</h2>
         <p>Preview chapters will be available here as production completes.</p>
@@ -121,8 +115,15 @@
 
 <footer>
     <div class="container">
-        <p>© 2025 Elliott English. All rights reserved.</p>
-        <p style="margin-top: 10px;"><a href="index.html">Home</a> · <a href="references.html">References</a> · <a href="about.html">About</a></p>
+        <p>&copy; 2026 Elliott English. All rights reserved.</p>
+        <p style="margin-top: 10px;">
+            <a href="index.html">Home</a> &middot;
+            <a href="references.html">References</a> &middot;
+            <a href="cure.html">Help Cure AMD</a> &middot;
+            <a href="reading.html">Related Reading</a> &middot;
+            <a href="about.html">About</a> &middot;
+            <a href="newsletter.html">Newsletter</a>
+        </p>
     </div>
 </footer>
 

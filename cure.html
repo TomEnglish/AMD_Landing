@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Cure AMD | AMD Insight</title>
+    <meta name="description" content="Community-curated interventions for age-related macular degeneration. Vote, explore, and contribute research.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Help Cure AMD — AMD Insight">
+    <meta property="og:description" content="Community-curated interventions for age-related macular degeneration. Vote, explore, and contribute research.">
+    <meta property="og:image" content="https://amdinsight.com/assets/cover.png">
+    <meta property="og:url" content="https://amdinsight.com/cure.html">
+    <meta property="og:site_name" content="AMD Insight">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .search-bar { margin-bottom: 20px; }
+        .search-bar input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 1px solid rgba(212, 184, 150, 0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        .search-bar input::placeholder { color: var(--text-muted); }
+
+        .filters { margin-bottom: 30px; }
+        .filter-group { margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .filter-label { color: var(--text-muted); font-size: 0.85rem; margin-right: 8px; }
+        .tag {
+            padding: 6px 14px;
+            border: 1px solid rgba(212, 184, 150, 0.2);
+            border-radius: 20px;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .tag:hover { border-color: var(--gold); color: var(--gold); }
+        .tag.active { background: var(--gold); color: var(--bg-darker); border-color: var(--gold); }
+
+        .sort-group { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .sort-group label { color: var(--text-muted); font-size: 0.85rem; }
+        .sort-group select {
+            padding: 8px 12px;
+            border: 1px solid rgba(212, 184, 150, 0.2);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .results-count { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; }
+
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+
+        .resource-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(212, 184, 150, 0.1);
+            border-radius: 8px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: border-color 0.2s;
+        }
+        .resource-card:hover { border-color: rgba(212, 184, 150, 0.3); }
+        .resource-card h3 { font-size: 1.2rem; }
+        .resource-card .card-desc { color: var(--text-muted); font-size: 0.9rem; flex: 1; }
+
+        .card-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+        .card-tag {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .card-tag.category { background: rgba(212, 184, 150, 0.15); color: var(--gold); }
+        .card-tag.evidence { background: rgba(100, 200, 150, 0.15); color: #8fd4a8; }
+        .card-tag.evidence.clinical_trials { background: rgba(100, 200, 150, 0.2); color: #6fc88a; }
+        .card-tag.evidence.emerging { background: rgba(255, 200, 100, 0.15); color: #e0c080; }
+        .card-tag.evidence.anecdotal { background: rgba(200, 150, 150, 0.15); color: #c8a0a0; }
+
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+        .vote-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border: 1px solid rgba(212, 184, 150, 0.2);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .vote-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .vote-btn.voted {
+            background: rgba(212, 184, 150, 0.1);
+            color: var(--gold);
+            border-color: var(--gold);
+            cursor: default;
+        }
+        .card-link { font-size: 0.9rem; }
+
+        .submit-section {
+            padding: 60px 0;
+            border-top: 1px solid rgba(212, 184, 150, 0.1);
+            margin-bottom: 40px;
+        }
+        .submit-section h2 { font-size: 1.8rem; margin-bottom: 15px; }
+        .submit-section > p { color: var(--text-muted); margin-bottom: 25px; }
+        .submit-section form { max-width: 600px; }
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; }
+        .form-row > * { flex: 1; }
+        .submit-section input,
+        .submit-section textarea,
+        .submit-section select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(212, 184, 150, 0.2);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+        .submit-section input::placeholder,
+        .submit-section textarea::placeholder { color: var(--text-muted); }
+        .submit-section textarea { min-height: 80px; resize: vertical; }
+        .submit-section select option { background: var(--bg-darker); color: var(--text); }
+
+        .loading { text-align: center; padding: 60px 0; color: var(--text-muted); }
+
+        @media (max-width: 768px) {
+            .resource-grid { grid-template-columns: 1fr; }
+            .form-row { flex-direction: column; gap: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="container">
+        <a href="index.html" class="nav-brand">AMD Insight</a>
+        <input type="checkbox" id="nav-toggle" class="nav-toggle">
+        <label for="nav-toggle" class="hamburger" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+        </label>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="book.html">The Book</a>
+            <a href="references.html">References</a>
+            <a href="cure.html" class="active">Help Cure AMD</a>
+            <a href="about.html">About</a>
+        </div>
+    </div>
+</nav>
+
+<header class="page-header">
+    <div class="container">
+        <h1>Help Us Cure AMD</h1>
+        <p>Community-curated interventions ranked by evidence and your votes. Explore, upvote, and submit what's working.</p>
+    </div>
+</header>
+
+<main class="container">
+
+    <!-- Search -->
+    <div class="search-bar">
+        <input type="text" id="search" placeholder="Search interventions...">
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+        <div class="filter-group">
+            <span class="filter-label">Category:</span>
+            <button class="tag active" data-category="all">All</button>
+            <button class="tag" data-category="supplement">Supplements</button>
+            <button class="tag" data-category="device">Devices</button>
+            <button class="tag" data-category="lifestyle">Lifestyle</button>
+            <button class="tag" data-category="diet">Diet</button>
+            <button class="tag" data-category="light_therapy">Light Therapy</button>
+            <button class="tag" data-category="breathing">Breathing</button>
+            <button class="tag" data-category="anti_aging">Anti-Aging</button>
+        </div>
+        <div class="filter-group">
+            <span class="filter-label">Evidence:</span>
+            <button class="tag active" data-evidence="all">All</button>
+            <button class="tag" data-evidence="clinical_trials">Clinical Trials</button>
+            <button class="tag" data-evidence="peer_reviewed">Peer-Reviewed</button>
+            <button class="tag" data-evidence="emerging">Emerging</button>
+            <button class="tag" data-evidence="anecdotal">Anecdotal</button>
+        </div>
+        <div class="sort-group">
+            <label for="sort">Sort by:</label>
+            <select id="sort">
+                <option value="trending">Trending</option>
+                <option value="votes">Most Voted</option>
+                <option value="newest">Newest</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Results count -->
+    <p class="results-count" id="results-count"></p>
+
+    <!-- Resource cards -->
+    <div class="resource-grid" id="resource-grid">
+        <div class="loading">Loading interventions...</div>
+    </div>
+
+    <!-- Submit form -->
+    <section class="submit-section" id="submit">
+        <h2>Submit a Resource</h2>
+        <p>Know of an intervention, study, or product that should be listed? Submit it for review.</p>
+        <form id="submit-form">
+            <div class="form-row">
+                <input type="text" name="title" placeholder="Resource name" required>
+                <input type="url" name="url" placeholder="URL (optional)">
+            </div>
+            <textarea name="description" placeholder="Brief description (1-2 sentences)" required></textarea>
+            <div class="form-row">
+                <select name="category" required>
+                    <option value="">Category...</option>
+                    <option value="supplement">Supplement</option>
+                    <option value="device">Device</option>
+                    <option value="lifestyle">Lifestyle</option>
+                    <option value="diet">Diet</option>
+                    <option value="light_therapy">Light Therapy</option>
+                    <option value="breathing">Breathing</option>
+                    <option value="anti_aging">Anti-Aging</option>
+                </select>
+                <select name="evidence_level" required>
+                    <option value="">Evidence level...</option>
+                    <option value="clinical_trials">Clinical Trials</option>
+                    <option value="peer_reviewed">Peer-Reviewed</option>
+                    <option value="emerging">Emerging</option>
+                    <option value="anecdotal">Anecdotal</option>
+                </select>
+            </div>
+            <input type="text" name="submitted_by" placeholder="Your name (optional)">
+            <button type="submit" class="btn btn-primary">Submit for Review</button>
+        </form>
+    </section>
+
+</main>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2026 Elliott English. All rights reserved.</p>
+        <p style="margin-top: 10px;">
+            <a href="index.html">Home</a> &middot;
+            <a href="references.html">References</a> &middot;
+            <a href="cure.html">Help Cure AMD</a> &middot;
+            <a href="reading.html">Related Reading</a> &middot;
+            <a href="about.html">About</a> &middot;
+            <a href="newsletter.html">Newsletter</a>
+        </p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Supabase config
+const SUPABASE_URL = 'https://gtrekvuelckdgsvesnpg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0cmVrdnVlbGNrZGdzdmVzbnBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MDMwNDksImV4cCI6MjA4NjA3OTA0OX0.zBIeKQ5Redx_uXtm4F7E3cNwVBLpzmJIsdDJ0k7AknI';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// State
+let allResources = [];
+let activeCategory = 'all';
+let activeEvidence = 'all';
+let currentSort = 'trending';
+let searchQuery = '';
+
+// Vote tracking via localStorage
+function getVotedIds() {
+    return JSON.parse(localStorage.getItem('amd_voted') || '[]');
+}
+function markVoted(id) {
+    const voted = getVotedIds();
+    if (!voted.includes(id)) {
+        voted.push(id);
+        localStorage.setItem('amd_voted', JSON.stringify(voted));
+    }
+}
+function hasVoted(id) {
+    return getVotedIds().includes(id);
+}
+
+// Ranking
+function recencyBonus(createdAt) {
+    const days = (Date.now() - new Date(createdAt).getTime()) / 86400000;
+    if (days < 7) return 20;
+    if (days < 30) return 10;
+    return 0;
+}
+
+function getScore(r) {
+    return (r.votes * 3) + (r.clicks * 1) + recencyBonus(r.created_at);
+}
+
+// Fetch from Supabase
+async function fetchResources() {
+    const { data, error } = await supabase
+        .from('resources')
+        .select('*')
+        .eq('approved', true);
+
+    if (error) {
+        console.error('Error fetching resources:', error);
+        document.getElementById('resource-grid').innerHTML =
+            '<p style="color: var(--text-muted); text-align: center;">Unable to load interventions. Please try again later.</p>';
+        return;
+    }
+    allResources = data || [];
+    renderResources();
+}
+
+// Format labels
+function formatLabel(str) {
+    return str.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+// Sanitize text for safe HTML insertion
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+// Render cards
+function renderResources() {
+    let filtered = allResources.filter(r => {
+        if (activeCategory !== 'all' && r.category !== activeCategory) return false;
+        if (activeEvidence !== 'all' && r.evidence_level !== activeEvidence) return false;
+        if (searchQuery && !r.title.toLowerCase().includes(searchQuery) &&
+            !r.description.toLowerCase().includes(searchQuery)) return false;
+        return true;
+    });
+
+    if (currentSort === 'votes') {
+        filtered.sort((a, b) => b.votes - a.votes);
+    } else if (currentSort === 'newest') {
+        filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    } else {
+        filtered.sort((a, b) => getScore(b) - getScore(a));
+    }
+
+    const grid = document.getElementById('resource-grid');
+    const count = document.getElementById('results-count');
+    count.textContent = filtered.length + ' intervention' + (filtered.length !== 1 ? 's' : '') + ' found';
+
+    if (filtered.length === 0) {
+        grid.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1;">No interventions match your filters.</p>';
+        return;
+    }
+
+    grid.innerHTML = filtered.map(r => {
+        const voted = hasVoted(r.id);
+        const safeTitle = escapeHtml(r.title);
+        const safeDesc = escapeHtml(r.description);
+        const linkHtml = r.url
+            ? '<a href="' + escapeHtml(r.url) + '" target="_blank" rel="noopener" class="card-link" onclick="trackClick(\'' + r.id + '\')">' + 'Learn more &rarr;</a>'
+            : '';
+
+        return '<div class="resource-card">' +
+            '<h3>' + safeTitle + '</h3>' +
+            '<p class="card-desc">' + safeDesc + '</p>' +
+            '<div class="card-tags">' +
+                '<span class="card-tag category">' + formatLabel(r.category) + '</span>' +
+                '<span class="card-tag evidence ' + r.evidence_level + '">' + formatLabel(r.evidence_level) + '</span>' +
+            '</div>' +
+            '<div class="card-actions">' +
+                '<button class="vote-btn ' + (voted ? 'voted' : '') + '" onclick="vote(\'' + r.id + '\')" ' + (voted ? 'disabled' : '') + '>' +
+                    '&#9650; ' + r.votes +
+                '</button>' +
+                linkHtml +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+// Vote
+async function vote(id) {
+    if (hasVoted(id)) return;
+    markVoted(id);
+    const resource = allResources.find(r => r.id === id);
+    if (resource) resource.votes++;
+    renderResources();
+    await supabase.rpc('increment_vote', { resource_id: id });
+}
+
+// Click tracking
+async function trackClick(id) {
+    const resource = allResources.find(r => r.id === id);
+    if (resource) resource.clicks++;
+    await supabase.rpc('increment_click', { resource_id: id });
+}
+
+// Category filter handlers
+document.querySelectorAll('[data-category]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('[data-category]').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        activeCategory = btn.dataset.category;
+        renderResources();
+    });
+});
+
+// Evidence filter handlers
+document.querySelectorAll('[data-evidence]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('[data-evidence]').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        activeEvidence = btn.dataset.evidence;
+        renderResources();
+    });
+});
+
+// Sort handler
+document.getElementById('sort').addEventListener('change', function(e) {
+    currentSort = e.target.value;
+    renderResources();
+});
+
+// Search handler
+document.getElementById('search').addEventListener('input', function(e) {
+    searchQuery = e.target.value.toLowerCase();
+    renderResources();
+});
+
+// Submit form
+document.getElementById('submit-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    var form = e.target;
+    var data = {
+        title: form.title.value.trim(),
+        description: form.description.value.trim(),
+        url: form.url.value.trim() || null,
+        category: form.category.value,
+        evidence_level: form.evidence_level.value,
+        submitted_by: form.submitted_by.value.trim() || null
+    };
+
+    var btn = form.querySelector('button[type="submit"]');
+    btn.textContent = 'Submitting...';
+    btn.disabled = true;
+
+    var result = await supabase.from('submissions').insert([data]);
+    if (result.error) {
+        alert('Something went wrong. Please try again.');
+        console.error(result.error);
+    } else {
+        alert('Thank you! Your submission will be reviewed.');
+        form.reset();
+    }
+    btn.textContent = 'Submit for Review';
+    btn.disabled = false;
+});
+
+// Initialize
+fetchResources();
+</script>
+
+</body>
+</html>

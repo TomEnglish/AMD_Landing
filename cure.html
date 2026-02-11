@@ -287,7 +287,7 @@
 // Supabase config
 const SUPABASE_URL = 'https://gtrekvuelckdgsvesnpg.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0cmVrdnVlbGNrZGdzdmVzbnBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MDMwNDksImV4cCI6MjA4NjA3OTA0OX0.zBIeKQ5Redx_uXtm4F7E3cNwVBLpzmJIsdDJ0k7AknI';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // State
 let allResources = [];
@@ -325,7 +325,7 @@ function getScore(r) {
 
 // Fetch from Supabase
 async function fetchResources() {
-    const { data, error } = await supabase
+    const { data, error } = await sb
         .from('resources')
         .select('*')
         .eq('approved', true);
@@ -411,14 +411,14 @@ async function vote(id) {
     const resource = allResources.find(r => r.id === id);
     if (resource) resource.votes++;
     renderResources();
-    await supabase.rpc('increment_vote', { resource_id: id });
+    await sb.rpc('increment_vote', { resource_id: id });
 }
 
 // Click tracking
 async function trackClick(id) {
     const resource = allResources.find(r => r.id === id);
     if (resource) resource.clicks++;
-    await supabase.rpc('increment_click', { resource_id: id });
+    await sb.rpc('increment_click', { resource_id: id });
 }
 
 // Category filter handlers
@@ -470,7 +470,7 @@ document.getElementById('submit-form').addEventListener('submit', async function
         btn.textContent = 'Submitting...';
         btn.disabled = true;
 
-        var result = await supabase.rpc('submit_resource', data);
+        var result = await sb.rpc('submit_resource', data);
         if (result.error) {
             alert('Something went wrong: ' + result.error.message);
             console.error(result.error);

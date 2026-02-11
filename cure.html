@@ -239,7 +239,7 @@
         <form id="submit-form">
             <div class="form-row">
                 <input type="text" name="title" placeholder="Resource name" required>
-                <input type="url" name="url" placeholder="URL (optional)">
+                <input type="text" name="url" placeholder="URL (optional)">
             </div>
             <textarea name="description" placeholder="Brief description (1-2 sentences)" required></textarea>
             <div class="form-row">
@@ -456,28 +456,31 @@ document.getElementById('search').addEventListener('input', function(e) {
 // Submit form
 document.getElementById('submit-form').addEventListener('submit', async function(e) {
     e.preventDefault();
-    var form = e.target;
-    var el = form.elements;
-    var data = {
-        p_title: el['title'].value.trim(),
-        p_description: el['description'].value.trim(),
-        p_url: el['url'].value.trim() || null,
-        p_category: el['category'].value,
-        p_evidence_level: el['evidence_level'].value,
-        p_submitted_by: el['submitted_by'].value.trim() || null
-    };
+    var btn = document.querySelector('#submit-form button[type="submit"]');
+    try {
+        var data = {
+            p_title: document.querySelector('#submit-form input[name="title"]').value.trim(),
+            p_description: document.querySelector('#submit-form textarea[name="description"]').value.trim(),
+            p_url: document.querySelector('#submit-form input[name="url"]').value.trim() || null,
+            p_category: document.querySelector('#submit-form select[name="category"]').value,
+            p_evidence_level: document.querySelector('#submit-form select[name="evidence_level"]').value,
+            p_submitted_by: document.querySelector('#submit-form input[name="submitted_by"]').value.trim() || null
+        };
 
-    var btn = form.querySelector('button[type="submit"]');
-    btn.textContent = 'Submitting...';
-    btn.disabled = true;
+        btn.textContent = 'Submitting...';
+        btn.disabled = true;
 
-    var result = await supabase.rpc('submit_resource', data);
-    if (result.error) {
-        alert('Something went wrong. Please try again.');
-        console.error(result.error);
-    } else {
-        alert('Thank you! Your submission will be reviewed.');
-        form.reset();
+        var result = await supabase.rpc('submit_resource', data);
+        if (result.error) {
+            alert('Something went wrong: ' + result.error.message);
+            console.error(result.error);
+        } else {
+            alert('Thank you! Your submission will be reviewed.');
+            document.getElementById('submit-form').reset();
+        }
+    } catch (err) {
+        alert('Error: ' + err.message);
+        console.error(err);
     }
     btn.textContent = 'Submit for Review';
     btn.disabled = false;

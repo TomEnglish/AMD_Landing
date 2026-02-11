@@ -27,14 +27,44 @@ CREATE TABLE IF NOT EXISTS submissions (
     category text NOT NULL,
     evidence_level text NOT NULL,
     submitted_by text,
+    submitted_ip text,
     created_at timestamptz DEFAULT now()
 );
 
--- 3. Enable Row Level Security
+-- 3. Create user_profiles table for admin role management
+CREATE TABLE IF NOT EXISTS user_profiles (
+    id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    email text,
+    is_admin boolean DEFAULT false,
+    created_at timestamptz DEFAULT now()
+);
+
+-- 4. Create vote_tracking table for server-side vote tracking
+CREATE TABLE IF NOT EXISTS vote_tracking (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    resource_id uuid REFERENCES resources(id) ON DELETE CASCADE,
+    voter_hash text NOT NULL,
+    created_at timestamptz DEFAULT now(),
+    UNIQUE(resource_id, voter_hash)
+);
+
+-- 5. Enable Row Level Security
 ALTER TABLE resources ENABLE ROW LEVEL SECURITY;
 ALTER TABLE submissions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE vote_tracking ENABLE ROW LEVEL SECURITY;
 
--- 4. RLS Policies
+-- 6. Create indexes for performance
+CREATE INDEX IF NOT EXISTS idx_resources_category ON resources(category);
+CREATE INDEX IF NOT EXISTS idx_resources_evidence ON resources(evidence_level);
+CREATE INDEX IF NOT EXISTS idx_resources_approved ON resources(approved);
+CREATE INDEX IF NOT EXISTS idx_resources_created ON resources(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_submissions_created ON submissions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_submissions_ip ON submissions(submitted_ip);
+CREATE INDEX IF NOT EXISTS idx_vote_tracking_resource ON vote_tracking(resource_id);
+CREATE INDEX IF NOT EXISTS idx_vote_tracking_hash ON vote_tracking(voter_hash);
+
+-- 7. RLS Policies
 -- Anyone can read approved resources
 CREATE POLICY "Public can read approved resources"
 ON resources FOR SELECT
@@ -45,7 +75,22 @@ CREATE POLICY "Public can submit"
 ON submissions FOR INSERT
 WITH CHECK (true);
 
--- 5. RPC Functions for atomic vote/click increments
+-- Users can read their own profile
+CREATE POLICY "Users can read own profile"
+ON user_profiles FOR SELECT
+USING (auth.uid() = id);
+
+-- Users can insert their own profile
+CREATE POLICY "Users can insert own profile"
+ON user_profiles FOR INSERT
+WITH CHECK (auth.uid() = id);
+
+-- Vote tracking: allow inserts with proper voter_hash
+CREATE POLICY "Public can track votes"
+ON vote_tracking FOR INSERT
+WITH CHECK (true);
+
+-- 8. RPC Functions for atomic vote/click increments
 CREATE OR REPLACE FUNCTION increment_vote(resource_id uuid)
 RETURNS void AS $$
 BEGIN
@@ -60,7 +105,109 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- 6. Seed data — 19 interventions from the book
+-- 9. RPC Function for submitting resources with rate limiting
+CREATE OR REPLACE FUNCTION submit_resource(
+    p_title text,
+    p_description text,
+    p_url text,
+    p_category text,
+    p_evidence_level text,
+    p_submitted_by text DEFAULT NULL
+)
+RETURNS json AS $$
+DECLARE
+    v_ip text;
+    v_recent_count integer;
+BEGIN
+    -- Get client IP (requires Supabase to pass X-Forwarded-For header)
+    v_ip := current_setting('request.headers', true)::json->>'x-forwarded-for';
+    
+    -- Rate limit: max 5 submissions per IP per hour
+    SELECT COUNT(*) INTO v_recent_count
+    FROM submissions
+    WHERE submitted_ip = v_ip
+    AND created_at > NOW() - INTERVAL '1 hour';
+    
+    IF v_recent_count >= 5 THEN
+        RETURN json_build_object('success', false, 'error', 'Rate limit exceeded. Please try again later.');
+    END IF;
+    
+    -- Insert submission
+    INSERT INTO submissions (title, description, url, category, evidence_level, submitted_by, submitted_ip)
+    VALUES (p_title, p_description, p_url, p_category, p_evidence_level, p_submitted_by, v_ip);
+    
+    RETURN json_build_object('success', true);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 10. RPC Function for voting with duplicate prevention
+CREATE OR REPLACE FUNCTION cast_vote(
+    p_resource_id uuid,
+    p_voter_hash text
+)
+RETURNS json AS $$
+DECLARE
+    v_exists boolean;
+BEGIN
+    -- Check if already voted
+    SELECT EXISTS(SELECT 1 FROM vote_tracking WHERE resource_id = p_resource_id AND voter_hash = p_voter_hash)
+    INTO v_exists;
+    
+    IF v_exists THEN
+        RETURN json_build_object('success', false, 'error', 'Already voted');
+    END IF;
+    
+    -- Record the vote
+    INSERT INTO vote_tracking (resource_id, voter_hash)
+    VALUES (p_resource_id, p_voter_hash);
+    
+    -- Increment vote count
+    UPDATE resources SET votes = votes + 1 WHERE id = p_resource_id AND approved = true;
+    
+    RETURN json_build_object('success', true);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 11. RPC Function to check if user is admin
+CREATE OR REPLACE FUNCTION is_user_admin()
+RETURNS boolean AS $$
+DECLARE
+    v_is_admin boolean;
+BEGIN
+    SELECT is_admin INTO v_is_admin
+    FROM user_profiles
+    WHERE id = auth.uid();
+    
+    RETURN COALESCE(v_is_admin, false);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 12. View for resources with calculated trending score
+CREATE OR REPLACE VIEW resources_with_score AS
+SELECT *,
+    (votes * 3 + clicks +
+     CASE WHEN created_at > NOW() - INTERVAL '7 days' THEN 20
+          WHEN created_at > NOW() - INTERVAL '30 days' THEN 10
+          ELSE 0 END) as trending_score
+FROM resources
+WHERE approved = true;
+
+-- 13. Trigger to create user profile on signup
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS trigger AS $$
+BEGIN
+    INSERT INTO user_profiles (id, email, is_admin)
+    VALUES (NEW.id, NEW.email, false);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+
+-- 14. Seed data — 19 interventions from the book
 INSERT INTO resources (title, description, url, category, evidence_level, votes, clicks, approved) VALUES
 ('Photobiomodulation (Red Light Therapy)', 'Near-infrared and red light therapy stimulates mitochondrial function in retinal cells. LIGHTSITE III trial showed significant improvement in visual acuity for dry AMD patients.', 'https://pubmed.ncbi.nlm.nih.gov/38227884', 'light_therapy', 'clinical_trials', 12, 8, true),
 
@@ -98,4 +245,5 @@ INSERT INTO resources (title, description, url, category, evidence_level, votes,
 
 ('Lutein + Zeaxanthin', 'Macular pigment carotenoids that filter blue light and provide antioxidant protection. Part of the AREDS2 formula. Higher macular pigment density correlates with lower AMD risk.', 'https://pubmed.ncbi.nlm.nih.gov/26541886', 'supplement', 'clinical_trials', 11, 6, true),
 
-('Vitamin K2 (MK-7)', 'Directs calcium away from soft tissues (including Bruch''s membrane) and into bones. May prevent vascular calcification that contributes to choroidal blood flow impairment.', 'https://pubmed.ncbi.nlm.nih.gov/23375872', 'supplement', 'emerging', 3, 1, true);
+('Vitamin K2 (MK-7)', 'Directs calcium away from soft tissues (including Bruch''s membrane) and into bones. May prevent vascular calcification that contributes to choroidal blood flow impairment.', 'https://pubmed.ncbi.nlm.nih.gov/23375872', 'supplement', 'emerging', 3, 1, true)
+ON CONFLICT DO NOTHING;

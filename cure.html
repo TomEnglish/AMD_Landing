@@ -296,7 +296,15 @@ let activeEvidence = 'all';
 let currentSort = 'trending';
 let searchQuery = '';
 
-// Vote tracking via localStorage
+// Vote tracking via localStorage (UX hint) + server-side enforcement
+function getVoterHash() {
+    let hash = localStorage.getItem('amd_voter_hash');
+    if (!hash) {
+        hash = crypto.randomUUID();
+        localStorage.setItem('amd_voter_hash', hash);
+    }
+    return hash;
+}
 function getVotedIds() {
     return JSON.parse(localStorage.getItem('amd_voted') || '[]');
 }
@@ -411,7 +419,12 @@ async function vote(id) {
     const resource = allResources.find(r => r.id === id);
     if (resource) resource.votes++;
     renderResources();
-    await sb.rpc('increment_vote', { resource_id: id });
+    var result = await sb.rpc('cast_vote', { p_resource_id: id, p_voter_hash: getVoterHash() });
+    if (result.error || (result.data && !result.data.success)) {
+        // Server rejected — undo optimistic update
+        if (resource) resource.votes--;
+        renderResources();
+    }
 }
 
 // Click tracking

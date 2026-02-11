@@ -459,19 +459,19 @@ document.getElementById('submit-form').addEventListener('submit', async function
     var form = e.target;
     var el = form.elements;
     var data = {
-        title: el['title'].value.trim(),
-        description: el['description'].value.trim(),
-        url: el['url'].value.trim() || null,
-        category: el['category'].value,
-        evidence_level: el['evidence_level'].value,
-        submitted_by: el['submitted_by'].value.trim() || null
+        p_title: el['title'].value.trim(),
+        p_description: el['description'].value.trim(),
+        p_url: el['url'].value.trim() || null,
+        p_category: el['category'].value,
+        p_evidence_level: el['evidence_level'].value,
+        p_submitted_by: el['submitted_by'].value.trim() || null
     };
 
     var btn = form.querySelector('button[type="submit"]');
     btn.textContent = 'Submitting...';
     btn.disabled = true;
 
-    var result = await supabase.from('submissions').insert([data]);
+    var result = await supabase.rpc('submit_resource', data);
     if (result.error) {
         alert('Something went wrong. Please try again.');
         console.error(result.error);

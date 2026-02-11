@@ -457,13 +457,14 @@ document.getElementById('search').addEventListener('input', function(e) {
 document.getElementById('submit-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     var form = e.target;
+    var el = form.elements;
     var data = {
-        title: form.title.value.trim(),
-        description: form.description.value.trim(),
-        url: form.url.value.trim() || null,
-        category: form.category.value,
-        evidence_level: form.evidence_level.value,
-        submitted_by: form.submitted_by.value.trim() || null
+        title: el['title'].value.trim(),
+        description: el['description'].value.trim(),
+        url: el['url'].value.trim() || null,
+        category: el['category'].value,
+        evidence_level: el['evidence_level'].value,
+        submitted_by: el['submitted_by'].value.trim() || null
     };
 
     var btn = form.querySelector('button[type="submit"]');

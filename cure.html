@@ -86,7 +86,7 @@
         .card-tag {
             padding: 3px 10px;
             border-radius: 12px;
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             font-weight: 500;
         }
         .card-tag.category { background: rgba(212, 184, 150, 0.15); color: var(--gold); }
@@ -162,6 +162,8 @@
 </head>
 <body>
 
+<a href="#main" class="skip-link">Skip to main content</a>
+
 <nav>
     <div class="container">
         <a href="index.html" class="nav-brand">AMD Insight</a>
@@ -186,11 +188,11 @@
     </div>
 </header>
 
-<main class="container">
+<main class="container" id="main">
 
     <!-- Search -->
     <div class="search-bar">
-        <input type="text" id="search" placeholder="Search interventions...">
+        <input type="text" id="search" placeholder="Search interventions..." aria-label="Search interventions">
     </div>
 
     <!-- Filters -->
@@ -238,12 +240,12 @@
         <p>Know of an intervention, study, or product that should be listed? Submit it for review.</p>
         <form id="submit-form">
             <div class="form-row">
-                <input type="text" name="title" placeholder="Resource name" required>
-                <input type="text" name="url" placeholder="URL (optional)">
+                <input type="text" name="title" placeholder="Resource name" required aria-label="Resource name">
+                <input type="text" name="url" placeholder="URL (optional)" aria-label="URL">
             </div>
-            <textarea name="description" placeholder="Brief description (1-2 sentences)" required></textarea>
+            <textarea name="description" placeholder="Brief description (1-2 sentences)" required aria-label="Description"></textarea>
             <div class="form-row">
-                <select name="category" required>
+                <select name="category" required aria-label="Category">
                     <option value="">Category...</option>
                     <option value="supplement">Supplement</option>
                     <option value="device">Device</option>
@@ -253,7 +255,7 @@
                     <option value="breathing">Breathing</option>
                     <option value="anti_aging">Anti-Aging</option>
                 </select>
-                <select name="evidence_level" required>
+                <select name="evidence_level" required aria-label="Evidence level">
                     <option value="">Evidence level...</option>
                     <option value="clinical_trials">Clinical Trials</option>
                     <option value="peer_reviewed">Peer-Reviewed</option>
@@ -261,7 +263,7 @@
                     <option value="anecdotal">Anecdotal</option>
                 </select>
             </div>
-            <input type="text" name="submitted_by" placeholder="Your name (optional)">
+            <input type="text" name="submitted_by" placeholder="Your name (optional)" aria-label="Your name">
             <button type="submit" class="btn btn-primary">Submit for Review</button>
         </form>
     </section>

@@ -9,7 +9,7 @@
     --gold: #d4b896;
     --gold-bright: #e8d4b8;
     --text: #e8e8e8;
-    --text-muted: #a0a0a0;
+    --text-muted: #b0b0b0;
 }
 
 /* === Reset === */
@@ -85,11 +85,28 @@ nav .container { display: flex; justify-content: space-between; align-items: cen
 .page-header p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
 
 /* === Footer === */
-footer { padding: 40px 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; border-top: 1px solid rgba(212, 184, 150, 0.1); }
+footer { padding: 40px 0; text-align: center; color: var(--text-muted); font-size: 0.95rem; border-top: 1px solid rgba(212, 184, 150, 0.1); }
 footer a { color: var(--gold); text-decoration: none; }
 
+/* === Skip Link (accessibility) === */
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 16px;
+    background: var(--gold);
+    color: var(--bg-darker);
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: 500;
+    z-index: 1000;
+    transition: top 0.2s;
+}
+.skip-link:focus {
+    top: 10px;
+}
+
 /* === Focus States (accessibility) === */
-a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
     outline: 2px solid var(--gold);
     outline-offset: 2px;
 }

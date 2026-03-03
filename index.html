@@ -91,6 +91,26 @@
         .author-content { max-width: 700px; }
         .author-content p { margin-bottom: 20px; color: var(--text-muted); }
 
+        .email-capture { padding: 80px 0; background: rgba(212, 184, 150, 0.06); text-align: center; }
+        .email-capture h2 { font-size: 2rem; margin-bottom: 15px; }
+        .email-capture .capture-desc { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto 30px; }
+        .email-form { display: flex; gap: 12px; max-width: 480px; margin: 0 auto; }
+        .email-form input[type="email"] {
+            flex: 1;
+            padding: 14px 18px;
+            border: 1px solid rgba(212, 184, 150, 0.25);
+            border-radius: 4px;
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        .email-form input[type="email"]::placeholder { color: var(--text-muted); }
+        .email-form button { white-space: nowrap; border: none; cursor: pointer; font-family: inherit; }
+        .email-msg { margin-top: 15px; font-size: 0.95rem; }
+        .email-msg.success { color: #8fd4a8; }
+        .email-msg.error { color: #e08080; }
+
         @media (max-width: 768px) {
             .hero {
                 grid-template-columns: 1fr;
@@ -102,10 +122,13 @@
             .cover { max-width: 250px; }
             .cta-buttons { justify-content: center; }
             .hero-content .tagline { margin-left: auto; margin-right: auto; }
+            .email-form { flex-direction: column; }
         }
     </style>
 </head>
 <body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
 
 <nav>
     <div class="container" style="max-width: 1100px;">
@@ -123,6 +146,8 @@
         </div>
     </div>
 </nav>
+
+<main id="main">
 
 <!-- Hero -->
 <section class="hero">
@@ -190,6 +215,20 @@
     </div>
 </section>
 
+<!-- Email Capture -->
+<section class="email-capture">
+    <div class="container" style="max-width: 1100px;">
+        <h2>Get the Free Protocol Appendix</h2>
+        <p class="capture-desc">A practical quick-reference covering the key interventions discussed in AMD Insight — organized by evidence level, with dosages and sources. Enter your email and it's yours.</p>
+        <form class="email-form" id="email-form">
+            <label for="capture-email" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Email address</label>
+            <input type="email" id="capture-email" name="email" placeholder="you@example.com" required>
+            <button type="submit" class="btn btn-primary">Send Me the Appendix</button>
+        </form>
+        <p class="email-msg" id="email-msg"></p>
+    </div>
+</section>
+
 <!-- Audio Section -->
 <section class="audio-section" id="audio">
     <div class="container" style="max-width: 1100px;">
@@ -219,6 +258,8 @@
     </div>
 </section>
 
+</main>
+
 <!-- Footer -->
 <footer>
     <div class="container">
@@ -233,6 +274,55 @@
         </p>
     </div>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://gtrekvuelckdgsvesnpg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0cmVrdnVlbGNrZGdzdmVzbnBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MDMwNDksImV4cCI6MjA4NjA3OTA0OX0.zBIeKQ5Redx_uXtm4F7E3cNwVBLpzmJIsdDJ0k7AknI';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+document.getElementById('email-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    var msg = document.getElementById('email-msg');
+    var btn = this.querySelector('button[type="submit"]');
+    var email = this.querySelector('input[name="email"]').value.trim();
+
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+    msg.textContent = '';
+    msg.className = 'email-msg';
+
+    try {
+        var result = await sb.rpc('subscribe_email', { p_email: email });
+        if (result.error) {
+            msg.textContent = 'Something went wrong. Please try again.';
+            msg.className = 'email-msg error';
+        } else if (result.data && result.data.success === false) {
+            msg.textContent = result.data.error || 'Something went wrong. Please try again.';
+            msg.className = 'email-msg error';
+        } else {
+            if (result.data && result.data.message === 'already_subscribed') {
+                msg.textContent = "You're already subscribed! Here's the appendix.";
+            } else {
+                msg.textContent = "You're in! Your download should start now.";
+            }
+            msg.className = 'email-msg success';
+            // Trigger PDF download
+            var a = document.createElement('a');
+            a.href = 'appendix.pdf';
+            a.download = 'AMD-Insight-Appendix.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    } catch (err) {
+        msg.textContent = 'Something went wrong. Please try again.';
+        msg.className = 'email-msg error';
+    }
+    btn.textContent = 'Send Me the Appendix';
+    btn.disabled = false;
+});
+</script>
 
 </body>
 </html>

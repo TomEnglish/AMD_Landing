@@ -247,3 +247,59 @@ INSERT INTO resources (title, description, url, category, evidence_level, votes,
 
 ('Vitamin K2 (MK-7)', 'Directs calcium away from soft tissues (including Bruch''s membrane) and into bones. May prevent vascular calcification that contributes to choroidal blood flow impairment.', 'https://pubmed.ncbi.nlm.nih.gov/23375872', 'supplement', 'emerging', 3, 1, true)
 ON CONFLICT DO NOTHING;
+
+-- ============================================
+-- 15. Email Subscribers
+-- ============================================
+
+-- Create email_subscribers table
+CREATE TABLE IF NOT EXISTS email_subscribers (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    email text NOT NULL UNIQUE,
+    ip text,
+    created_at timestamptz DEFAULT now()
+);
+
+-- Enable RLS
+ALTER TABLE email_subscribers ENABLE ROW LEVEL SECURITY;
+
+-- Index for duplicate/rate-limit checks
+CREATE INDEX IF NOT EXISTS idx_email_subscribers_email ON email_subscribers(email);
+CREATE INDEX IF NOT EXISTS idx_email_subscribers_ip ON email_subscribers(ip);
+
+-- RPC function for subscribing (SECURITY DEFINER bypasses RLS)
+CREATE OR REPLACE FUNCTION subscribe_email(p_email text)
+RETURNS json AS $$
+DECLARE
+    v_ip text;
+    v_recent_count integer;
+    v_exists boolean;
+BEGIN
+    -- Get client IP
+    v_ip := current_setting('request.headers', true)::json->>'x-forwarded-for';
+
+    -- Check if already subscribed
+    SELECT EXISTS(SELECT 1 FROM email_subscribers WHERE email = lower(trim(p_email)))
+    INTO v_exists;
+
+    IF v_exists THEN
+        RETURN json_build_object('success', true, 'message', 'already_subscribed');
+    END IF;
+
+    -- Rate limit: max 5 signups per IP per hour
+    SELECT COUNT(*) INTO v_recent_count
+    FROM email_subscribers
+    WHERE ip = v_ip
+    AND created_at > NOW() - INTERVAL '1 hour';
+
+    IF v_recent_count >= 5 THEN
+        RETURN json_build_object('success', false, 'error', 'Rate limit exceeded. Please try again later.');
+    END IF;
+
+    -- Insert subscriber
+    INSERT INTO email_subscribers (email, ip)
+    VALUES (lower(trim(p_email)), v_ip);
+
+    RETURN json_build_object('success', true, 'message', 'subscribed');
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

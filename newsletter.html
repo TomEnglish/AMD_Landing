@@ -41,13 +41,12 @@
 
         .privacy-note { margin-top: 25px; font-size: 0.85rem; color: var(--text-muted); }
 
-        .dev-notice { background: rgba(255, 200, 100, 0.1); border: 1px dashed rgba(255, 200, 100, 0.3); border-radius: 8px; padding: 20px; margin-bottom: 30px; }
-        .dev-notice p { color: rgba(255, 200, 100, 0.8); font-size: 0.9rem; margin: 0; }
-
         @media (max-width: 768px) { .signup-box h1 { font-size: 2.2rem; } .form-container { padding: 30px 20px; } }
     </style>
 </head>
 <body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
 
 <nav>
     <div class="container">
@@ -66,33 +65,30 @@
     </div>
 </nav>
 
-<main>
+<main id="main">
     <div class="container">
         <div class="signup-box">
             <h1>Stay Updated</h1>
             <p class="subtitle">New research. New chapters. No spam.</p>
-            <p>Get notified when new research is added, when major updates are made to the book, and when new content drops on Spotify.</p>
+            <p>Get notified when new research is added, when major updates are made to the book, and when new content drops on Spotify. Plus, get the free Protocol Appendix immediately.</p>
 
             <div class="form-container">
-                <div class="dev-notice">
-                    <p>🚧 Newsletter signup coming soon. Check back shortly!</p>
-                </div>
-
-                <form action="#" method="POST">
+                <form id="newsletter-form">
                     <div class="form-group">
                         <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" placeholder="you@example.com" disabled>
+                        <input type="email" id="email" name="email" placeholder="you@example.com" required>
                     </div>
-                    <button type="submit" class="btn btn-primary" disabled>Join the List</button>
+                    <button type="submit" class="btn btn-primary">Join the List & Get the Appendix</button>
                 </form>
+                <p id="newsletter-msg" style="margin-top: 15px; font-size: 0.95rem;"></p>
 
                 <div class="benefits">
                     <h3>What you'll receive:</h3>
                     <ul class="benefit-list">
+                        <li>The free Protocol Appendix (PDF) — immediate download</li>
                         <li>New audiobook and Spotify updates</li>
                         <li>New research summaries as they're added</li>
                         <li>Major book updates and revisions</li>
-                        <li>Occasional deep-dives on specific topics</li>
                     </ul>
                 </div>
 
@@ -115,6 +111,55 @@
         </p>
     </div>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://gtrekvuelckdgsvesnpg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0cmVrdnVlbGNrZGdzdmVzbnBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MDMwNDksImV4cCI6MjA4NjA3OTA0OX0.zBIeKQ5Redx_uXtm4F7E3cNwVBLpzmJIsdDJ0k7AknI';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+document.getElementById('newsletter-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    var msg = document.getElementById('newsletter-msg');
+    var btn = this.querySelector('button[type="submit"]');
+    var email = this.querySelector('input[name="email"]').value.trim();
+
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+    msg.textContent = '';
+    msg.style.color = '';
+
+    try {
+        var result = await sb.rpc('subscribe_email', { p_email: email });
+        if (result.error) {
+            msg.textContent = 'Something went wrong. Please try again.';
+            msg.style.color = '#e08080';
+        } else if (result.data && result.data.success === false) {
+            msg.textContent = result.data.error || 'Something went wrong. Please try again.';
+            msg.style.color = '#e08080';
+        } else {
+            if (result.data && result.data.message === 'already_subscribed') {
+                msg.textContent = "You're already subscribed! Here's the appendix.";
+            } else {
+                msg.textContent = "You're in! Your download should start now.";
+            }
+            msg.style.color = '#8fd4a8';
+            // Trigger PDF download
+            var a = document.createElement('a');
+            a.href = 'appendix.pdf';
+            a.download = 'AMD-Insight-Appendix.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    } catch (err) {
+        msg.textContent = 'Something went wrong. Please try again.';
+        msg.style.color = '#e08080';
+    }
+    btn.textContent = 'Join the List & Get the Appendix';
+    btn.disabled = false;
+});
+</script>
 
 </body>
 </html>
